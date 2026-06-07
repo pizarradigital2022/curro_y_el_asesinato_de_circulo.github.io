@@ -18,20 +18,6 @@
             --input-bg: #3d3d3d;
         }
         
-        /* =======================================================
-           CLASES PARA TEXTO NORMAL DESTACADO (Uso con <span>)
-           ======================================================= */
-        .texto-rojo-legible {
-            color: var(--danger-color) !important;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.15); /* Resplandor sutil */
-        }
-        
-        .texto-azul-legible {
-            color: var(--blue-neon) !important;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.2); /* Resplandor sutil */
-            font-weight: bold;
-        }
-
         body {
             font-family: 'Courier New', Courier, monospace;
             background-color: var(--bg-color);
@@ -259,7 +245,7 @@
 
         /* Éxito y Fracaso */
         .success-text { color: #00ff00; text-align: center; font-size: 18px;}
-        .fail-text { color: #ff0000; text-align: center; font-size: 18px;}
+        .fail-text { color: var(--danger-color); text-shadow: 0 0 5px rgba(255, 255, 255, 0.15); /* Resplandor sutil */; text-align: center; font-size: 18px;}
     </style>
 </head>
 <body>
@@ -358,7 +344,7 @@
         <div id="screen-fail" class="screen">
             <h1>Caso Irresuelto / Error de Deducción</h1>
             <div class="image-placeholder"><img src="./resources/fracaso_curro_y_mi_avatar_tristes.png" alt="Fracaso, Curro y mi avatar tristes por no haber podido apresar al asesino" width="450"></img></div>
-            <div class="texto-rojo-legible">
+            <div class="fail-text">
                 <p><strong>El asesino ha escapado o has acusado a un inocente...</strong></p>
                 <p id="fail-reason">Alguna de las áreas calculadas es incorrecta o el culpable seleccionado no es el verdadero asesino. ¡Revisa bien tus operaciones y el Teorema de Pitágoras!</p>
             </div>
