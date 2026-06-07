@@ -8,13 +8,29 @@
     <link rel="icon" type="image/x-icon" href="./resources/favicon.ico">
   
   <style>
-        :root {
+    :root {
             --bg-color: #1a1a1a;
             --panel-bg: #2d2d2d;
-            --accent-color: #d4af37; /* Dorado Cluedo */
-            --danger-color: #8b0000; /* Rojo Sangre */
+            --accent-color: #d4af37;  /* Dorado Cluedo */
+            --danger-color: #ff4d4d;  /* Rojo coral neón (reemplaza al rojo puro, mucho más legible) */
+            --blue-neon: #00d2ff;      /* Azul cian brillante (nuevo, perfecto para el fondo oscuro) */
             --text-color: #e0e0e0;
             --input-bg: #3d3d3d;
+        }
+        
+        /* =======================================================
+           CLASES PARA TEXTO NORMAL DESTACADO (Uso con <span>)
+           ======================================================= */
+        .texto-rojo-legible {
+            color: var(--danger-color) !important;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.15); /* Resplandor sutil */
+            font-weight: bold;
+        }
+        
+        .texto-azul-legible {
+            color: var(--blue-neon) !important;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.2); /* Resplandor sutil */
+            font-weight: bold;
         }
 
         body {
