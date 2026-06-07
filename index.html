@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curro y el misterioso asesinato de Círculo</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./resources/favicon.ico">
+  
+  <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --panel-bg: #2d2d2d;
+            --accent-color: #d4af37; /* Dorado Cluedo */
+            --danger-color: #8b0000; /* Rojo Sangre */
+            --text-color: #e0e0e0;
+            --input-bg: #3d3d3d;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--panel-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.7);
+            border: 2px solid var(--accent-color);
+            box-sizing: border-box;
+        }
+
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        h1, h2, h3 {
+            color: var(--accent-color);
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h1 { border-bottom: 2px dashed var(--accent-color); padding-bottom: 10px; }
+
+        .image-placeholder {
+            width: 100%;
+            height: 200px;
+            background-color: #111;
+            border: 1px dashed #555;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            color: #777;
+            font-style: italic;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: var(--danger-color);
+            color: white;
+            border: 1px solid var(--accent-color);
+            padding: 12px 24px;
+            font-size: 16px;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            display: block;
+            margin: 20px auto;
+        }
+
+        button:hover {
+            background-color: #b30000;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        /* Pantalla 1: Configuración */
+        .time-select {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .time-btn {
+            background-color: #333;
+            padding: 20px 40px;
+            font-size: 20px;
+        }
+        .time-btn.selected {
+            background-color: var(--accent-color);
+            color: black;
+            font-weight: bold;
+        }
+
+        /* Pantalla 2: Juego */
+        .game-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        #timer-bar {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 4px;
+            letter-spacing: 3px;
+            position: sticky;
+            top: 10px;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .story-box {
+            background-color: #222;
+            padding: 20px;
+            border-left: 4px solid var(--danger-color);
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .suspects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .suspect-card {
+            background: #252525;
+            padding: 15px;
+            border: 1px solid #444;
+            border-radius: 4px;
+        }
+
+        .suspect-card label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--accent-color);
+        }
+
+        .suspect-card input {
+            width: 100%;
+            padding: 8px;
+            background-color: var(--input-bg);
+            border: 1px solid #555;
+            color: white;
+            font-family: inherit;
+            box-sizing: border-box;
+            border-radius: 4px;
+        }
+
+        .culprit-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #1a1a1a;
+            border: 2px solid var(--danger-color);
+            text-align: center;
+        }
+
+        .culprit-section select {
+            padding: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            background: var(--input-bg);
+            color: white;
+            border: 1px solid var(--accent-color);
+            width: 250px;
+        }
+
+        /* Pistas y Acordeón */
+        .hint-container {
+            margin-top: 20px;
+        }
+        .hint-header {
+            background-color: #3a3a3a;
+            padding: 10px;
+            cursor: pointer;
+            border: 1px solid #555;
+            font-weight: bold;
+            text-align: center;
+        }
+        .hint-content {
+            display: none;
+            background-color: #222;
+            padding: 15px;
+            border: 1px solid #555;
+            border-top: none;
+        }
+
+        /* Modo Profesor */
+        .prof-btn {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: #333;
+            padding: 5px 10px;
+            font-size: 12px;
+            margin: 0;
+            opacity: 0.6;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #222;
+            border: 2px solid var(--accent-color);
+            padding: 20px;
+            z-index: 100;
+            box-shadow: 0 0 30px black;
+            width: 90%;
+            max-width: 500px;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 99;
+        }
+
+        /* Éxito y Fracaso */
+        .success-text { color: #00ff00; text-align: center; font-size: 18px;}
+        .fail-text { color: #ff0000; text-align: center; font-size: 18px;}
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div id="screen-intro" class="screen active">
+            <h1>Murdoku: El Caso del Área Sangrienta</h1>
+            <div class="image-placeholder">[Espacio para Imagen: Mansión Geometría / Portada de Misterio]</div>
+            
+            <p><strong>INSTRUCCIONES DEL CASO:</strong></p>
+            <p>Don Círculo ha sido asesinado en el salón-comedor. Sabemos que el asesino tiene una <strong>edad igual a su área</strong> y que su edad exacta es de <strong>48 años</strong>. Además, la pista definitiva del inspector Curro dice que el asesino mide exactamente <strong>4 metros de altura</strong> y ya estaba dentro del salón comedor fingiendo otra coartada.</p>
+            <p>Deberás calcular las áreas de todos los sospechosos. ¡Cuidado! Los sospechosos regulares ocultan su apotema; búscala usando el Teorema de Pitágoras.</p>
+            
+            <h3>Selecciona el tiempo de la investigación:</h3>
+            <div class="time-select">
+                <button class="time-btn selected" onclick="selectTime(30)">30 Minutos</button>
+                <button class="time-btn" onclick="selectTime(60)">60 Minutos</button>
+            </div>
+            <p style="text-align:center; color: #aaa; font-size: 12px;">Nota: Pedir el panel de fórmulas restará tiempo (5 min en modo 30 min / 10 min en modo 60 min).</p>
+            <button onclick="startGame()">Comenzar Investigación</button>
+        </div>
+
+        <div id="screen-game" class="screen">
+            <div id="timer-bar">TIEMPO RESTANTE: --:--</div>
+            <h2>Ficha del Caso</h2>
+            <div class="image-placeholder">[Espacio para Imagen: Escena del Crimen / Sospechosos]</div>
+
+            <div class="story-box">
+                <strong>Declaraciones de los Sospechosos:</strong><br><br>
+                • <strong>Cuadrado:</strong> "Estaba en la cocina. Mis 4 lados miden 6 metros cada uno."<br>
+                • <strong>Rectángulo:</strong> "Estaba en la biblioteca. Mi base es de 12 metros y mi altura es de 4 metros."<br>
+                • <strong>Rombo:</strong> "Estaba en el baño. Mi diagonal mayor mide 16 metros y la menor 6 metros."<br>
+                • <strong>Romboide:</strong> "Estaba en el jardín. Comparto base con el rectángulo (12 m), pero mi altura es de 3 metros."<br>
+                • <strong>Triángulo:</strong> "Estaba en el sótano. Mi base mide 16 metros y mi altura es de 6 metros."<br>
+                • <strong>Trapecio:</strong> "Vigilaba la puerta exterior. Mi base mayor es de 14 m, la menor es de 10 m y mi altura es de 4 m."<br>
+                • <strong>Pentágono Regular:</strong> "Estaba en la terraza. Mis 5 lados miden 6 metros cada uno. La distancia del centro al vértice (radio) es de 5.1 metros." (¡Calcula la apotema!)<br>
+                • <strong>Hexágono Regular:</strong> "Estaba en el ala oeste. Mi lado y mi radio miden 4 metros." (¡Calcula la apotema!)
+            </div>
+
+            <div class="hint-container">
+                <div class="hint-header" onclick="toggleFormulas()">⚠️ DESPLEGAR PANEL DE FÓRMULAS (Penaliza tiempo)</div>
+                <div id="hint-content" class="hint-content">
+                    <p><strong>Fórmulas de Ayuda:</strong></p>
+                    <ul>
+                        <li>Cuadrado: $A = l^2$</li>
+                        <li>Rectángulo y Romboide: $A = b \cdot h$</li>
+                        <li>Triángulo: $A = (b \cdot h) / 2$</li>
+                        <li>Rombo: $A = (D \cdot d) / 2$</li>
+                        <li>Trapecio: $A = ((B + b) \cdot h) / 2$</li>
+                        <li>Polígonos Regulares: $A = (Perímetro \cdot apotema) / 2$</li>
+                        <li><i>Teorema de Pitágoras para apotema: $Radio^2 = (Lado/2)^2 + apotema^2$</i></li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Introduce las Áreas Calculadas (Edades):</h3>
+            <div class="suspects-grid">
+                <div class="suspect-card"><label>Cuadrado</label><input type="number" id="area-cuadrado" step="0.01"></div>
+                <div class="suspect-card"><label>Rectángulo</label><input type="number" id="area-rectangulo" step="0.01"></div>
+                <div class="suspect-card"><label>Rombo</label><input type="number" id="area-rombo" step="0.01"></div>
+                <div class="suspect-card"><label>Romboide</label><input type="number" id="area-romboide" step="0.01"></div>
+                <div class="suspect-card"><label>Triángulo</label><input type="number" id="area-triangulo" step="0.01"></div>
+                <div class="suspect-card"><label>Trapecio</label><input type="number" id="area-trapecio" step="0.01"></div>
+                <div class="suspect-card"><label>Pentágono R.</label><input type="number" id="area-pentagono" step="0.1" placeholder="Aproxima a 1 decimal"></div>
+                <div class="suspect-card"><label>Hexágono R.</label><input type="number" id="area-hexagono" step="0.1" placeholder="Aproxima a 1 decimal"></div>
+            </div>
+
+            <div class="culprit-section">
+                <h3>¿QUIÉN ES EL CULPABLE?</h3>
+                <select id="select-culprit">
+                    <option value="">-- Selecciona al asesino --</option>
+                    <option value="cuadrado">El Cuadrado</option>
+                    <option value="rectangulo">El Rectángulo</option>
+                    <option value="rombo">El Rombo</option>
+                    <option value="romboide">El Romboide</option>
+                    <option value="triangulo">El Triángulo</option>
+                    <option value="trapecio">El Trapecio</option>
+                    <option value="pentagono">El Pentágono Regular</option>
+                    <option value="hexagono">El Hexágono Regular</option>
+                </select>
+                <button onclick="checkAccusation()" style="margin-top:20px;">Emitir Veredicto</button>
+            </div>
+        </div>
+
+        <div id="screen-success" class="screen">
+            <h1>¡Caso Cerrado!</h1>
+            <div class="image-placeholder">[Espacio para Imagen: El asesino entre rejas / Inspector Curro victorioso]</div>
+            <div class="success-text">
+                <p><strong>¡Excelente trabajo, inspector!</strong></p>
+                <p>Has calculado correctamente todas las edades (áreas) y descubierto que el <strong>Rectángulo</strong> mentía. Su coartada era falsa, su área es de 48 y su altura de 4 metros encaja perfectamente con el hilo de seda del picaporte.</p>
+                <p>Don Círculo por fin descansa en paz en el gran plano cartesiano.</p>
+            </div>
+        </div>
+
+        <div id="screen-fail" class="screen">
+            <h1>Caso Irresuelto / Error de Deducción</h1>
+            <div class="image-placeholder">[Espacio para Imagen: El asesino escapando / Ficha policial archivada]</div>
+            <div class="fail-text">
+                <p><strong>El asesino ha escapado o has acusado a un inocente...</strong></p>
+                <p id="fail-reason">Alguna de las áreas calculadas es incorrecta o el culpable seleccionado no es el verdadero asesino. ¡Revisa bien tus operaciones y el Teorema de Pitágoras!</p>
+            </div>
+            <button onclick="restartGame()">Volver a intentarlo</button>
+        </div>
+
+    </div>
+
+    <button class="prof-btn" onclick="openProfMode()">Modo Profesor</button>
+    <div id="modal-overlay" class="modal-overlay" onclick="closeProfMode()"></div>
+    <div id="modal-prof" class="modal">
+        <h3>Soluciones del Caso</h3>
+        <p><strong>Áreas correctas:</strong></p>
+        <ul>
+            <li>Cuadrado: 36</li>
+            <li>Rectángulo: 48 (Culpable - Altura 4m)</li>
+            <li>Rombo: 48 (Inocente - Sin altura de 4m)</li>
+            <li>Romboide: 36</li>
+            <li>Triángulo: 48 (Inocente - Altura 6m)</li>
+            <li>Trapecio: 48 (Inocente - Estaba fuera vigilando)</li>
+            <li>Pentágono: ~61.8 (Apotema ~4.12)</li>
+            <li>Hexágono: ~41.5 (Apotema ~3.46)</li>
+        </ul>
+        <p><strong>Culpable:</strong> Rectángulo</p>
+        <button onclick="closeProfMode()">Cerrar</button>
+    </div>
+
+    <script>
+        // Respuestas correctas (tolerancia para decimales en polígonos regulares)
+        const solutions = {
+            cuadrado: 36,
+            rectangulo: 48,
+            rombo: 48,
+            romboide: 36,
+            triangulo: 48,
+            trapecio: 48,
+            pentagono: 61.8, 
+            hexagono: 41.5  
+        };
+        const correctCulprit = "rectangulo";
+
+        let selectedDuration = 30; // por defecto
+        let timeLeft = 0; 
+        let timerInterval;
+        let hintUsed = false;
+
+        function selectTime(minutes) {
+            selectedDuration = minutes;
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                if(btn.textContent.includes(minutes)) btn.classList.add('selected');
+            });
+        }
+
+        function changeScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function startGame() {
+            timeLeft = selectedDuration * 60;
+            hintUsed = false;
+            document.getElementById('hint-content').style.display = 'none';
+            
+            // Limpiar inputs
+            document.querySelectorAll('.suspect-card input').forEach(i => i.value = '');
+            document.getElementById('select-culprit').value = '';
+
+            changeScreen('screen-game');
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('fail-reason').textContent = "¡Se ha agotado el tiempo! El asesino destruyó las pruebas y huyó de la Mansión Geometría.";
+                    changeScreen('screen-fail');
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            document.getElementById('timer-bar').textContent = `TIEMPO RESTANTE: ${minutes}:${seconds}`;
+        }
+
+        function toggleFormulas() {
+            const content = document.getElementById('hint-content');
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+            } else {
+                content.style.display = 'block';
+                if (!hintUsed) {
+                    hintUsed = true;
+                    let penalty = selectedDuration === 30 ? 5 : 10;
+                    timeLeft -= (penalty * 60);
+                    if(timeLeft < 0) timeLeft = 0;
+                    alert(`¡Pista desbloqueada! Penalización: -${penalty} minutos.`);
+                    updateTimerDisplay();
+                }
+            }
+        }
+
+        function checkAccusation() {
+            // Obtener valores del alumno
+            let ansCuadrado = parseFloat(document.getElementById('area-cuadrado').value);
+            let ansRectangulo = parseFloat(document.getElementById('area-rectangulo').value);
+            let ansRombo = parseFloat(document.getElementById('area-rombo').value);
+            let ansRomboide = parseFloat(document.getElementById('area-romboide').value);
+            let ansTriangulo = parseFloat(document.getElementById('area-triangulo').value);
+            let ansTrapecio = parseFloat(document.getElementById('area-trapecio').value);
+            let ansPentagono = parseFloat(document.getElementById('area-pentagono').value);
+            let ansHexagono = parseFloat(document.getElementById('area-hexagono').value);
+            let ansCulprit = document.getElementById('select-culprit').value;
+
+            // Validación básica de margen de error para los decimales de polígonos usando Math.abs
+            let isCorrect = 
+                ansCuadrado === solutions.cuadrado &&
+                ansRectangulo === solutions.rectangulo &&
+                ansRombo === solutions.rombo &&
+                ansRomboide === solutions.romboide &&
+                ansTriangulo === solutions.triangulo &&
+                ansTrapecio === solutions.trapecio &&
+                Math.abs(ansPentagono - solutions.pentagono) <= 0.5 &&
+                Math.abs(ansHexagono - solutions.hexagono) <= 0.5 &&
+                ansCulprit === correctCulprit;
+
+            clearInterval(timerInterval);
+
+            if (isCorrect) {
+                changeScreen('screen-success');
+            } else {
+                document.getElementById('fail-reason').textContent = "Alguna de las áreas calculadas es incorrecta o el culpable seleccionado no es el verdadero asesino. ¡Revisa bien tus operaciones y el Teorema de Pitágoras!";
+                changeScreen('screen-fail');
+            }
+        }
+
+        function restartGame() {
+            changeScreen('screen-intro');
+        }
+
+        // Funciones del Modo Profesor
+        function openProfMode() {
+            let password = prompt("Introduce la contraseña de profesor:");
+            if (password === "geometria123") { // Contraseña simple de ejemplo
+                document.getElementById('modal-prof').style.display = 'block';
+                document.getElementById('modal-overlay').style.display = 'block';
+            } else if (password !== null) {
+                alert("Contraseña incorrecta.");
+            }
+        }
+
+        function closeProfMode() {
+            document.getElementById('modal-prof').style.display = 'none';
+            document.getElementById('modal-overlay').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
