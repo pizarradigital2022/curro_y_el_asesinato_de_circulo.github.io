@@ -508,7 +508,7 @@
         // Funciones del Modo Profesor
         function openProfMode() {
             let password = prompt("Introduce la contraseña de profesor:");
-            if (password === "geometria123") { // Contraseña simple de ejemplo
+            if ((password === "geometria123")||(password === "PROFE")) { // Contraseña simple de ejemplo
                 document.getElementById('modal-prof').style.display = 'block';
                 document.getElementById('modal-overlay').style.display = 'block';
             } else if (password !== null) {
